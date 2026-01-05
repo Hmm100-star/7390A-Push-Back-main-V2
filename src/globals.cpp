@@ -93,7 +93,7 @@ lemlib::ExpoDriveCurve throttle_curve(
 lemlib::ExpoDriveCurve steer_curve(
     3,
     10,
-    1.0625
+    1.035  
 );
 
 //

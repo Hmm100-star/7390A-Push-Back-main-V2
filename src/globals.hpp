@@ -29,6 +29,7 @@ extern lemlib::ExpoDriveCurve steer_curve;
 // chassis
 extern lemlib::Chassis chassis;
 
+//Intak
 extern pros::MotorGroup intake;
 
 // IMU
