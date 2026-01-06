@@ -51,9 +51,13 @@ void BlueRight() {
 void Skills() {
   // chassis.setPose(-48, -48, 90); // Example starting pose
   // Add Skills routine here
+  Descorer.set_value(true);
   intake.move_velocity(600);
-  chassis.setPose(0, 0, 0);
-  chassis.moveToPose(0, 40, 0, 10000);
+  left_motors.move_velocity(100);
+  right_motors.move_velocity(100);
+  pros::delay(1000);
+  left_motors.move_velocity(-200);
+  right_motors.move_velocity(200);
 }
 
 void DoNothing() {
@@ -70,5 +74,11 @@ void TuneChassis() {
     }
     
   chassis.setPose(0,0,0);
-  chassis.moveToPose(-3, 38, -15, 10000, {.maxSpeed = 450});
+  chassis.moveToPoint(0,20,10000);
+  chassis.setPose(0,0,0);
+  pros::delay(5000);
+chassis.turnToHeading(90,10000);
+pros::delay(5000);
+chassis.setPose(0,0,0);
+  chassis.moveToPose(-5, 38, -15, 10000, {.forwards = true});
 }

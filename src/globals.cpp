@@ -58,19 +58,18 @@ lemlib::Drivetrain drivetrain(
 // ===================== PID CONTROLLERS =====================
 //
 lemlib::ControllerSettings lateral_controller(
-    50,    // Kp
+    9,    // Kp
     0,      // kI
-    3,   // kD
+    2.3,   // kD
     3,     // anti-windup
     0.5,    // small error range
     100,   // small error timeout
     3,      // large error range
     500,    // large error timeout
-    30      // slew
+    12 //slew
 );
 
-lemlib::ControllerSettings angular_controller(2.125 
-    , // proportional gain (kP)
+lemlib::ControllerSettings angular_controller(2.125, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               11.75, // derivative gain (kD)
                                               3, // anti windup

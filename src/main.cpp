@@ -91,6 +91,9 @@ void initialize() {
 
 // === Autonomous ===
 void autonomous() {
+    if (pros::competition::is_disabled() || !pros::competition::is_autonomous()){
+        return;
+    };
     startOdometryDisplay();
 
     int selected = getSelectedAuton();
@@ -124,7 +127,13 @@ void autonomous() {
 }
 
 // === Disabled & Competition Init ===
-void disabled() {}
+void disabled() {
+     LongGoalFlap = false;
+    MidGoalFlap = false;
+    MatchLoaderFlap = false;
+    DescorerFlap = false;
+
+}
 void competition_initialize() {}
 
 // === Operator Control ===
