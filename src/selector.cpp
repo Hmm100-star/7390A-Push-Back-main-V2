@@ -2,6 +2,7 @@
 #include "liblvgl/lvgl.h"
 #include "pros/apix.h"
 #include "globals.hpp"
+#include <cmath>
 #include <stdio.h>
 
 lv_obj_t *homeScreen; // define homeScreen
@@ -14,11 +15,16 @@ int selectedAlliance = -1; // -1: None, 0: Red, 1: Blue
 lv_obj_t *allianceScreen;
 lv_obj_t *autonScreen;
 lv_obj_t *confirmLabel;
+static lv_obj_t *intake_voltage_label = nullptr;
+static lv_obj_t *chassis_voltage_label = nullptr;
+static lv_obj_t *distance_label = nullptr;
 
 // Forward declarations
 void createAllianceScreen();
 void createAutonScreen();
 void updateConfirmation();
+void initVoltageDisplay();
+void updateVoltageDisplay();
 
 // Button event callbacks
 static void red_btn_event_handler(lv_event_t *e) {
@@ -85,6 +91,7 @@ static void back_btn_event_handler(lv_event_t *e) {
 
 void initializeSelector() {
   homeScreen = lv_scr_act(); // set homeScreen to the current active screen
+  initVoltageDisplay();
   // Create screens
   allianceScreen = lv_obj_create(NULL);
   autonScreen = lv_obj_create(NULL);
@@ -209,3 +216,58 @@ int getSelectedAuton() { return selectedAuton; }
 bool isRedAlliance() { return selectedAlliance == 0; }
 
 bool isBlueAlliance() { return selectedAlliance == 1; }
+
+void initVoltageDisplay() {
+  if (homeScreen == NULL || intake_voltage_label != nullptr ||
+      chassis_voltage_label != nullptr || distance_label != nullptr) {
+    return;
+  }
+
+  intake_voltage_label = lv_label_create(homeScreen);
+  lv_obj_set_pos(intake_voltage_label, 10, 10);
+  lv_label_set_text(intake_voltage_label, "Intake: -- mV");
+
+  chassis_voltage_label = lv_label_create(homeScreen);
+  lv_obj_set_pos(chassis_voltage_label, 10, 30);
+  lv_label_set_text(chassis_voltage_label, "Chassis: -- Ohm");
+
+  distance_label = lv_label_create(homeScreen);
+  lv_obj_set_pos(distance_label, 10, 50);
+  lv_label_set_text(distance_label, "Distance: -- mm");
+}
+
+void updateVoltageDisplay() {
+  if (intake_voltage_label == nullptr || chassis_voltage_label == nullptr ||
+      distance_label == nullptr) {
+    return;
+  }
+
+  int intake_voltage = intake.get_voltage();
+  int left_voltage = std::abs(left_motors.get_voltage());
+  int right_voltage = std::abs(right_motors.get_voltage());
+  int chassis_voltage = (left_voltage + right_voltage) / 2;
+  int left_current = std::abs(left_motors.get_current_draw());
+  int right_current = std::abs(right_motors.get_current_draw());
+  int chassis_current = (left_current + right_current) / 2;
+
+  char buffer[64];
+  snprintf(buffer, sizeof(buffer), "Intake: %d mV", intake_voltage);
+  lv_label_set_text(intake_voltage_label, buffer);
+
+  if (chassis_current == 0) {
+    snprintf(buffer, sizeof(buffer), "Chassis: -- Ohm");
+  } else {
+    float chassis_resistance =
+        static_cast<float>(chassis_voltage) / chassis_current;
+    snprintf(buffer, sizeof(buffer), "Chassis: %.2f Ohm", chassis_resistance);
+  }
+  lv_label_set_text(chassis_voltage_label, buffer);
+
+  int distance_mm = distance_sensor.get_distance();
+  if (distance_mm < 0) {
+    snprintf(buffer, sizeof(buffer), "Distance: -- mm");
+  } else {
+    snprintf(buffer, sizeof(buffer), "Distance: %d mm", distance_mm);
+  }
+  lv_label_set_text(distance_label, buffer);
+}

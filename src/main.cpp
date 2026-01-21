@@ -15,6 +15,7 @@ bool driveReversed = false;
 bool odometry_started = false;
 pros::Task *auton_task = nullptr;
 bool driver_control_active = true;
+pros::Task *voltage_task = nullptr;
 
 // Start autonomous task
 void startAuton() {
@@ -72,6 +73,14 @@ void initialize() {
     chassis.calibrate();
     chassis.setPose(0, 0, 0); // set initial chassis pose
     initializeSelector();
+    if (voltage_task == nullptr) {
+        voltage_task = new pros::Task([] {
+            while (true) {
+                updateVoltageDisplay();
+                pros::delay(200);
+            }
+        });
+    }
     pros::delay(2000); // give time for imu to calibrate
     // Set initial state of pneumatics
     LongGoal.set_value(0);

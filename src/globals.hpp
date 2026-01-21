@@ -3,6 +3,7 @@
 #include "lemlib/api.hpp"
 #include "autons.hpp"
 #include "selector.hpp"
+#include "pros/distance.hpp"
 #include <string>
 
 // Motors
@@ -38,6 +39,8 @@ extern pros::Imu imu;
 // Rotation Sensors
 extern pros::Rotation horizontal_sensor;
 extern pros::Rotation vertical_sensor;
+// Distance Sensor
+extern pros::Distance distance_sensor;
 
 // Pneumatics
 extern pros::adi::DigitalOut LongGoal;

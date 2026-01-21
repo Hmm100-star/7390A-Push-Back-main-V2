@@ -16,3 +16,7 @@ int getSelectedAuton();
 // Check alliance color
 bool isRedAlliance();
 bool isBlueAlliance();
+
+// Voltage display on home screen
+void initVoltageDisplay();
+void updateVoltageDisplay();

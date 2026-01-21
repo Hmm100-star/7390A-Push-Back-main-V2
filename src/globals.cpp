@@ -15,6 +15,7 @@ pros::Imu imu(6);
 
 pros::Rotation horizontal_sensor(5);
 pros::Rotation vertical_sensor(-7);
+pros::Distance distance_sensor(17);
 
 //
 // ===================== TRACKING WHEELS =====================

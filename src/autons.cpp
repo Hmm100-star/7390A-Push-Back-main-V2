@@ -6,7 +6,38 @@
 #include "liblvgl/lvgl.h"
 #include "pros/apix.h"
 #include "selector.hpp"
+#include <algorithm>
+#include <cmath>
 #include <stdio.h>
+
+static float calculateResistance(const pros::MotorGroup &group) {
+  int voltage = std::abs(group.get_voltage());
+  int current = std::abs(group.get_current_draw());
+  int safe_current = std::max(1, current);
+  return static_cast<float>(voltage) / safe_current;
+}
+
+static void driveBackWhileHighVoltage(int rpm, int thresholdMv, int timeoutMs) {
+  int start = pros::millis();
+
+  while (pros::millis() - start < timeoutMs) {
+    int leftMv  = std::abs(left_motors.get_voltage());
+    int rightMv = std::abs(right_motors.get_voltage());
+    int avgDriveMv = (leftMv + rightMv) / 2;
+
+    int intakeMv = std::abs(intake.get_voltage());
+
+    // Keep backing up while EITHER system is above threshold
+    if (!(avgDriveMv > thresholdMv || intakeMv > thresholdMv)) break;
+
+    left_motors.move_velocity(-rpm);
+    right_motors.move_velocity(-rpm);
+    pros::delay(10);
+  }
+
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+}
 
 // Helper to set initial pose based on routine
 void RedLeft() {
@@ -49,16 +80,105 @@ void BlueRight() {
 }
 
 void Skills() {
-  // chassis.setPose(-48, -48, 90); // Example starting pose
-  // Add Skills routine here
-  Descorer.set_value(true);
+  if (homeScreen != NULL) {
+    lv_scr_load(homeScreen);
+  }
+  chassis.setPose(0, 0, 0);
+  Descorer.set_value(true); // moves odom up to avoid interference w/ parking
   intake.move_velocity(600);
-  left_motors.move_velocity(100);
-  right_motors.move_velocity(100);
+  // robot moves forward to intake blocks
+  left_motors.move_velocity(35);
+  right_motors.move_velocity(35);
+  pros::delay(500);
+  left_motors.move_velocity(10);
+  right_motors.move_velocity(15);
   pros::delay(1000);
-  left_motors.move_velocity(-200);
-  right_motors.move_velocity(200);
+  left_motors.move_velocity(33);
+  right_motors.move_velocity(30);
+  pros::delay(1600);
+  left_motors.move_velocity(-120);
+  right_motors.move_velocity(-120);
+  pros::delay(400);
+  left_motors.move_velocity(80);
+  right_motors.move_velocity(80);
+  pros::delay(600);
+  left_motors.move_velocity(-140);
+  right_motors.move_velocity(-140);
+  pros::delay(1500);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(100);
+  // robot pushes against the park zone to align & set pose
+  constexpr float kResistThreshold = 1.0f;
+  constexpr float kResistAdjustThreshold = 0.9f;
+  int left_hit_velocity = 40;
+  int right_hit_velocity = 40;
+
+  while (true) {
+    float left_resistance = calculateResistance(left_motors);
+    float right_resistance = calculateResistance(right_motors);
+    if (right_resistance >= kResistThreshold ||
+        left_resistance >= kResistThreshold) {
+      break;
+    }
+
+    if (left_resistance > kResistAdjustThreshold) {
+      left_hit_velocity = 20;
+    }
+    if (right_resistance > kResistAdjustThreshold) {
+      right_hit_velocity = 20;
+    }
+    left_motors.move_velocity(left_hit_velocity);
+    right_motors.move_velocity(right_hit_velocity);
+    pros::delay(40);
+  }
+  //left_motors.move_velocity(35);
+  //right_motors.move_velocity(35);
+  //pros::delay(1700);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  Descorer.set_value(false); // lowers odom back down for position tracking
+  pros::delay(200);
+  chassis.setPose((distance_sensor.get_distance() - 1700) / 25.4, 0, imu.get_heading());
+  chassis.moveToPose(0, -14, 0, 3000, {.forwards = false});
+  intake.move_velocity(0);
+  chassis.turnToHeading(-45, 2000);
+  chassis.moveToPoint(19.3, -31, 3000, {.forwards = false});
+  chassis.turnToHeading(42.6, 1500);
+  chassis.moveToPose(8.7, -39, 40.7, 2000, {.forwards = false}, false);
+  MidGoal.set_value(true);
+  intake.move_velocity(520);
+  //chassis.moveToPoint(18, -31, 4000);
+  /*
+  pros::delay(650);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(1000);
+  left_motors.move_velocity(-160);
+  right_motors.move_velocity(-160);
+  pros::delay(1200);
+  left_motors.move_velocity(15);
+  right_motors.move_velocity(15);
+  pros::delay(700);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(500);
+  i call my girlfriend mommy - Christian Tan
+  Descorer.set_value(false);
+
+  chassis.setPose(0, 0, 0);
+  chassis.moveToPose(0, -14, 0, 3000, {.forwards = false});
+  intake.move_velocity(0);
+  chassis.turnToHeading(-45, 2000);
+  chassis.moveToPoint(18, -31, 4000);
+  // IMPORTANT: stop any chassis control before raw motor control (if these exist in your LemLib)
+  // chassis.cancelAllMotions();
+  // chassis.stop();
+ */
+  // Now do your “if voltage > 10,000 mV, drive backwards” behavior safely:
+  
 }
+
 
 void DoNothing() {
   // Do nothing
