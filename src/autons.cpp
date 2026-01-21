@@ -10,35 +10,6 @@
 #include <cmath>
 #include <stdio.h>
 
-static float calculateResistance(const pros::MotorGroup &group) {
-  int voltage = std::abs(group.get_voltage());
-  int current = std::abs(group.get_current_draw());
-  int safe_current = std::max(1, current);
-  return static_cast<float>(voltage) / safe_current;
-}
-
-static void driveBackWhileHighVoltage(int rpm, int thresholdMv, int timeoutMs) {
-  int start = pros::millis();
-
-  while (pros::millis() - start < timeoutMs) {
-    int leftMv  = std::abs(left_motors.get_voltage());
-    int rightMv = std::abs(right_motors.get_voltage());
-    int avgDriveMv = (leftMv + rightMv) / 2;
-
-    int intakeMv = std::abs(intake.get_voltage());
-
-    // Keep backing up while EITHER system is above threshold
-    if (!(avgDriveMv > thresholdMv || intakeMv > thresholdMv)) break;
-
-    left_motors.move_velocity(-rpm);
-    right_motors.move_velocity(-rpm);
-    pros::delay(10);
-  }
-
-  left_motors.move_velocity(0);
-  right_motors.move_velocity(0);
-}
-
 // Helper to set initial pose based on routine
 void RedLeft() {
   // chassis.setPose(-48, -48, 90); // Example starting pose
@@ -111,26 +82,20 @@ void Skills() {
   // robot pushes against the park zone to align & set pose
   constexpr float kResistThreshold = 1.0f;
   constexpr float kResistAdjustThreshold = 0.9f;
-  int left_hit_velocity = 40;
-  int right_hit_velocity = 40;
+  int left_hit_velocity = 70;
+  int right_hit_velocity = 70;
 
-  while (true) {
-    float left_resistance = calculateResistance(left_motors);
-    float right_resistance = calculateResistance(right_motors);
-    if (right_resistance >= kResistThreshold ||
-        left_resistance >= kResistThreshold) {
-      break;
-    }
 
-    if (left_resistance > kResistAdjustThreshold) {
+  while (left_motors.get_current_draw() < 1500 && right_motors.get_current_draw() < 1500) {
+    if (left_motors.get_current_draw() > 1500) {
       left_hit_velocity = 20;
     }
-    if (right_resistance > kResistAdjustThreshold) {
+    if (right_motors.get_current_draw() > 1500) {
       right_hit_velocity = 20;
     }
     left_motors.move_velocity(left_hit_velocity);
     right_motors.move_velocity(right_hit_velocity);
-    pros::delay(40);
+    pros::delay(20);
   }
   //left_motors.move_velocity(35);
   //right_motors.move_velocity(35);
