@@ -67,9 +67,10 @@ void Skills() {
   left_motors.move_velocity(33);
   right_motors.move_velocity(30);
   pros::delay(1600);
-  left_motors.move_velocity(-120);
-  right_motors.move_velocity(-120);
-  pros::delay(400);
+  left_motors.move_velocity(-600);
+  right_motors.move_velocity(-600);
+  pros::delay(200);
+  /*
   left_motors.move_velocity(80);
   right_motors.move_velocity(80);
   pros::delay(600);
@@ -79,6 +80,7 @@ void Skills() {
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
   pros::delay(100);
+  */
   // robot pushes against the park zone to align & set pose
   constexpr float kResistThreshold = 1.0f;
   constexpr float kResistAdjustThreshold = 0.9f;
@@ -105,7 +107,7 @@ void Skills() {
   Descorer.set_value(false); // lowers odom back down for position tracking
   pros::delay(200);
   chassis.setPose((distance_sensor.get_distance() - 1700) / 25.4, 0, imu.get_heading());
-  chassis.moveToPose(0, -14, 0, 3000, {.forwards = false});
+  chassis.moveToPoint(0, -14, 3000, {.forwards = false});
   intake.move_velocity(0);
   chassis.turnToHeading(-45, 2000);
   chassis.moveToPoint(19.3, -31, 3000, {.forwards = false});
@@ -113,6 +115,11 @@ void Skills() {
   chassis.moveToPose(8.7, -39, 40.7, 2000, {.forwards = false}, false);
   MidGoal.set_value(true);
   intake.move_velocity(520);
+  pros::delay(3000);
+  intake.move_velocity(0);
+  MidGoal.set_value(false);
+  chassis.moveToPoint(50.6, 2.4, 2000);
+  MatchLoader.set_value(true);
   //chassis.moveToPoint(18, -31, 4000);
   /*
   pros::delay(650);
