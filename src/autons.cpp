@@ -62,32 +62,18 @@ void Skills() {
   right_motors.move_velocity(35);
   pros::delay(500);
   left_motors.move_velocity(10);
-  right_motors.move_velocity(15);
-  pros::delay(1000);
-  left_motors.move_velocity(33);
+  right_motors.move_velocity(16);
+    pros::delay(1000);
+  left_motors.move_velocity(34);
   right_motors.move_velocity(30);
   pros::delay(1600);
-  left_motors.move_velocity(-600);
-  right_motors.move_velocity(-600);
-  pros::delay(200);
-  /*
-  left_motors.move_velocity(80);
-  right_motors.move_velocity(80);
-  pros::delay(600);
-  left_motors.move_velocity(-140);
-  right_motors.move_velocity(-140);
-  pros::delay(1500);
-  left_motors.move_velocity(0);
-  right_motors.move_velocity(0);
-  pros::delay(100);
-  */
-  // robot pushes against the park zone to align & set pose
-  constexpr float kResistThreshold = 1.0f;
-  constexpr float kResistAdjustThreshold = 0.9f;
+  left_motors.move_velocity(-200);
+  right_motors.move_velocity(-200);
+  pros::delay(300);
+
+  // move forward until hitting the park zone
   int left_hit_velocity = 70;
   int right_hit_velocity = 70;
-
-
   while (left_motors.get_current_draw() < 1500 && right_motors.get_current_draw() < 1500) {
     if (left_motors.get_current_draw() > 1500) {
       left_hit_velocity = 20;
