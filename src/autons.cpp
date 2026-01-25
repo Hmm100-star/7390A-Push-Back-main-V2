@@ -58,28 +58,32 @@ void Skills() {
   Descorer.set_value(true); // moves odom up to avoid interference w/ parking
   intake.move_velocity(600);
   // robot moves forward to intake blocks
-  left_motors.move_velocity(35);
-  right_motors.move_velocity(35);
-  pros::delay(500);
+  left_motors.move_velocity(20);
+  right_motors.move_velocity(50);
+  pros::delay(700);
+  left_motors.move_velocity(75);
+  right_motors.move_velocity(10);
+  pros::delay(1300); 
   left_motors.move_velocity(10);
-  right_motors.move_velocity(16);
-    pros::delay(1000);
-  left_motors.move_velocity(34);
-  right_motors.move_velocity(30);
-  pros::delay(1600);
-  left_motors.move_velocity(-200);
-  right_motors.move_velocity(-200);
-  pros::delay(300);
-
-  // move forward until hitting the park zone
-  int left_hit_velocity = 70;
-  int right_hit_velocity = 70;
-  while (left_motors.get_current_draw() < 1500 && right_motors.get_current_draw() < 1500) {
-    if (left_motors.get_current_draw() > 1500) {
+  right_motors.move_velocity(60);
+  pros::delay(1000);
+  left_motors.move_velocity(-120);
+  right_motors.move_velocity(-177);
+  pros::delay(1500);
+  //robot waits to allow current to 0
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(200);
+  int left_hit_velocity = 120;
+  int right_hit_velocity = 120;
+  while (left_motors.get_current_draw() < 1750 && right_motors.get_current_draw() < 1750) {
+    if (left_motors.get_current_draw() > 1700) {
       left_hit_velocity = 20;
+      right_hit_velocity = 120;
     }
-    if (right_motors.get_current_draw() > 1500) {
+    if (right_motors.get_current_draw() > 1700) {
       right_hit_velocity = 20;
+      left_hit_velocity = 120;
     }
     left_motors.move_velocity(left_hit_velocity);
     right_motors.move_velocity(right_hit_velocity);
@@ -92,20 +96,32 @@ void Skills() {
   right_motors.move_velocity(0);
   Descorer.set_value(false); // lowers odom back down for position tracking
   pros::delay(200);
-  chassis.setPose((distance_sensor.get_distance() - 1700) / 25.4, 0, imu.get_heading());
+  chassis.setPose((distance_sensor.get_distance() - 1700) / 25.4, 0, 0 );
   chassis.moveToPoint(0, -14, 3000, {.forwards = false});
   intake.move_velocity(0);
   chassis.turnToHeading(-45, 2000);
-  chassis.moveToPoint(19.3, -31, 3000, {.forwards = false});
-  chassis.turnToHeading(42.6, 1500);
-  chassis.moveToPose(8.7, -39, 40.7, 2000, {.forwards = false}, false);
+  chassis.moveToPoint(19, -33.2, 3000, {.forwards = false});
+  chassis.turnToHeading(45, 1500);
+  chassis.moveToPose(8.9, -39.9, 45, 2000, {.forwards = false}, false);
   MidGoal.set_value(true);
   intake.move_velocity(520);
-  pros::delay(3000);
+  pros::delay(750);
+  left_motors.move_velocity(5);
+  right_motors.move_velocity(5);
+  pros::delay(100);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(1400);
   intake.move_velocity(0);
-  MidGoal.set_value(false);
-  chassis.moveToPoint(50.6, 2.4, 2000);
+  MidGoal.set_value(false); 
+  chassis.moveToPoint(49, 1.4, 2000, {.maxSpeed = 80}, false);
   MatchLoader.set_value(true);
+  chassis.turnToHeading(0, 1500);
+  pros::delay(200);
+  left_motors.move_velocity(600);
+  right_motors.move_velocity(600);
+  intake.move_velocity(600);
+
   //chassis.moveToPoint(18, -31, 4000);
   /*
   pros::delay(650);
