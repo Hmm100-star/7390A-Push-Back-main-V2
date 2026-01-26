@@ -17,6 +17,6 @@ int getSelectedAuton();
 bool isRedAlliance();
 bool isBlueAlliance();
 
-// Voltage display on home screen
-void initVoltageDisplay();
-void updateVoltageDisplay();
+// Home screen sensor display
+void initHomeDisplay();
+void updateHomeDisplay();

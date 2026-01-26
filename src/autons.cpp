@@ -54,7 +54,7 @@ void Skills() {
   if (homeScreen != NULL) {
     lv_scr_load(homeScreen);
   }
-  chassis.setPose(0, 0, 0);
+  chassis.setPose(0, 0, imu.get_heading());
   Descorer.set_value(true); // moves odom up to avoid interference w/ parking
   intake.move_velocity(600);
   // robot moves forward to intake blocks
@@ -65,10 +65,10 @@ void Skills() {
   right_motors.move_velocity(10);
   pros::delay(1300); 
   left_motors.move_velocity(10);
-  right_motors.move_velocity(60);
+  right_motors.move_velocity(67);
   pros::delay(1000);
-  left_motors.move_velocity(-120);
-  right_motors.move_velocity(-177);
+  left_motors.move_velocity(-140);
+  right_motors.move_velocity(-155);
   pros::delay(1500);
   //robot waits to allow current to 0
   left_motors.move_velocity(0);
@@ -96,13 +96,25 @@ void Skills() {
   right_motors.move_velocity(0);
   Descorer.set_value(false); // lowers odom back down for position tracking
   pros::delay(200);
-  chassis.setPose((distance_sensor.get_distance() - 1700) / 25.4, 0, 0 );
+  double h = imu.get_heading();                 // 0..360
+  double err = fmod(h + 180.0, 360.0) - 180.0;  // -> [-180, 180)
+
+if (fabs(err) <= 2.2) {
+  chassis.setPose(
+    (distance_sensor.get_distance() - 1700) / 25.4,
+    0,
+    0
+  );
+} else {
+  pros::delay(5000);
+}
+
   chassis.moveToPoint(0, -14, 3000, {.forwards = false});
   intake.move_velocity(0);
   chassis.turnToHeading(-45, 2000);
-  chassis.moveToPoint(19, -33.2, 3000, {.forwards = false});
+  chassis.moveToPoint(22.5, -32.5, 3000, {.forwards = false});
   chassis.turnToHeading(45, 1500);
-  chassis.moveToPose(8.9, -39.9, 45, 2000, {.forwards = false}, false);
+  chassis.moveToPose(11.9, -39.8, 45, 2000, {.forwards = false}, false);
   MidGoal.set_value(true);
   intake.move_velocity(520);
   pros::delay(750);
@@ -114,14 +126,26 @@ void Skills() {
   pros::delay(1400);
   intake.move_velocity(0);
   MidGoal.set_value(false); 
-  chassis.moveToPoint(49, 1.4, 2000, {.maxSpeed = 80}, false);
+  chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 80}, false);
   MatchLoader.set_value(true);
   chassis.turnToHeading(0, 1500);
-  pros::delay(200);
-  left_motors.move_velocity(600);
-  right_motors.move_velocity(600);
+  pros::delay(400);
+  chassis.cancelAllMotions();
   intake.move_velocity(600);
-
+  bool intakeCurrentReached = false;
+  while (intakeCurrentReached && (intake.get_current_draw() < 2200 || intake.get_current_draw() > 2300)) {
+    left_motors.move_velocity(180);
+    right_motors.move_velocity(180);
+    if (intake.get_current_draw() > 2200 && intake.get_current_draw() < 2350) {
+      intakeCurrentReached = true;
+    } else {
+      intakeCurrentReached = false;
+    }
+    pros::delay(20);
+  }
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(200);
   //chassis.moveToPoint(18, -31, 4000);
   /*
   pros::delay(650);

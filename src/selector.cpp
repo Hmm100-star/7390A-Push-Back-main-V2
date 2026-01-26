@@ -15,7 +15,7 @@ int selectedAlliance = -1; // -1: None, 0: Red, 1: Blue
 lv_obj_t *allianceScreen;
 lv_obj_t *autonScreen;
 lv_obj_t *confirmLabel;
-static lv_obj_t *intake_voltage_label = nullptr;
+static lv_obj_t *intake_current_label = nullptr;
 static lv_obj_t *chassis_current_label = nullptr;
 static lv_obj_t *distance_label = nullptr;
 
@@ -23,8 +23,8 @@ static lv_obj_t *distance_label = nullptr;
 void createAllianceScreen();
 void createAutonScreen();
 void updateConfirmation();
-void initVoltageDisplay();
-void updateVoltageDisplay();
+void initHomeDisplay();
+void updateHomeDisplay();
 
 // Button event callbacks
 static void red_btn_event_handler(lv_event_t *e) {
@@ -91,7 +91,7 @@ static void back_btn_event_handler(lv_event_t *e) {
 
 void initializeSelector() {
   homeScreen = lv_scr_act(); // set homeScreen to the current active screen
-  initVoltageDisplay();
+  initHomeDisplay();
   // Create screens
   allianceScreen = lv_obj_create(NULL);
   autonScreen = lv_obj_create(NULL);
@@ -217,15 +217,15 @@ bool isRedAlliance() { return selectedAlliance == 0; }
 
 bool isBlueAlliance() { return selectedAlliance == 1; }
 
-void initVoltageDisplay() {
-  if (homeScreen == NULL || intake_voltage_label != nullptr ||
+void initHomeDisplay() {
+  if (homeScreen == NULL || intake_current_label != nullptr ||
       chassis_current_label != nullptr || distance_label != nullptr) {
     return;
   }
 
-  intake_voltage_label = lv_label_create(homeScreen);
-  lv_obj_set_pos(intake_voltage_label, 10, 10);
-  lv_label_set_text(intake_voltage_label, "Intake: -- mV");
+  intake_current_label = lv_label_create(homeScreen);
+  lv_obj_set_pos(intake_current_label, 10, 10);
+  lv_label_set_text(intake_current_label, "Intake: -- Amp");
 
   chassis_current_label = lv_label_create(homeScreen);
   lv_obj_set_pos(chassis_current_label, 10, 30);
@@ -236,19 +236,24 @@ void initVoltageDisplay() {
   lv_label_set_text(distance_label, "Distance: -- mm");
 }
 
-void updateVoltageDisplay() {
-  if (intake_voltage_label == nullptr || chassis_current_label == nullptr ||
+void updateHomeDisplay() {
+  if (intake_current_label == nullptr || chassis_current_label == nullptr ||
       distance_label == nullptr) {
     return;
   }
 
-  int intake_voltage = intake.get_voltage();
+  double intake_current = intake.get_current_draw();
   int left_current = std::abs(left_motors.get_current_draw());
   int right_current = std::abs(right_motors.get_current_draw());
   int chassis_current = (left_current + right_current) / 2;
   char buffer[64];
-  snprintf(buffer, sizeof(buffer), "Intake: %d mV", intake_voltage);
-  lv_label_set_text(intake_voltage_label, buffer);
+  if (std::abs(intake_current) < 0.01) {
+    snprintf(buffer, sizeof(buffer), "Intake: -- Amp");
+  } else {
+    snprintf(buffer, sizeof(buffer), "Intake: %.2f Amp",
+             std::abs(intake_current));
+  }
+  lv_label_set_text(intake_current_label, buffer);
 
   if (chassis_current == 0) {
     snprintf(buffer, sizeof(buffer), "Chassis: -- Amp");

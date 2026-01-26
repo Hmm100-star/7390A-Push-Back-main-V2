@@ -56,7 +56,7 @@ void startOdometryDisplay() {
 
     pros::lcd::initialize();
     pros::lcd::set_text(0, "Robot Initialized");
-
+ 
     pros::Task screen_task([] {
         while (true) {
             auto pose = chassis.getPose();
@@ -76,7 +76,7 @@ void initialize() {
     if (voltage_task == nullptr) {
         voltage_task = new pros::Task([] {
             while (true) {
-                updateVoltageDisplay();
+                updateHomeDisplay();
                 pros::delay(200);
             }
         });
