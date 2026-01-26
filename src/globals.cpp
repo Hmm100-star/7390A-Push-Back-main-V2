@@ -1,5 +1,6 @@
 #include "globals.hpp"
 #include "lemlib/api.hpp"
+#include "pros/optical.hpp"
 
 //
 // ===================== MOTORS =====================
@@ -12,7 +13,7 @@ pros::MotorGroup intake({20, -21}, pros::MotorGearset::blue);
 // ===================== SENSORS =====================
 //
 pros::Imu imu(6);
-
+pros::Optical optical_sensor(16);
 pros::Rotation horizontal_sensor(5);
 pros::Rotation vertical_sensor(-7);
 pros::Distance distance_sensor(17);

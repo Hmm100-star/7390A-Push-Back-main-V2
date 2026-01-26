@@ -42,6 +42,9 @@ extern pros::Rotation vertical_sensor;
 // Distance Sensor
 extern pros::Distance distance_sensor;
 
+// Optical Sensor
+extern pros::Optical optical_sensor;
+
 // Pneumatics
 extern pros::adi::DigitalOut LongGoal;
 extern pros::adi::DigitalOut MidGoal;

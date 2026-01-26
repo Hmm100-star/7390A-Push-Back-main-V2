@@ -5,6 +5,7 @@
 #include "pros/llemu.hpp"
 #include "liblvgl/lvgl.h"
 #include "pros/apix.h"
+#include "pros/optical.h"
 #include "selector.hpp"
 #include <algorithm>
 #include <cmath>
@@ -16,14 +17,25 @@ void RedLeft() {
   // Add Red Left routine here
   pros::lcd::print(0, "Running Red Left");
 
-  // Debug: Print to controller
-  pros::Controller controller(pros::E_CONTROLLER_MASTER);
-  controller.print(2, 0, "Running RedLeft");
-
-  // Debug: Move motors directly to verify connection
-
-  chassis.setPose(0, 0, 0);
-  chassis.moveToPose(-100.0f, -100.0f, 10.0f, 100000);
+  intake.move_velocity(600);
+  MatchLoader.set_value(true);
+  bool intakeCurrentReached = false;
+  while (optical_sensor.get_rgb().red > 100 || optical_sensor.get_rgb().blue > 100) {
+    left_motors.move_velocity(180);
+    right_motors.move_velocity(180);
+    pros::delay(20);
+  }
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(200);
+  /*
+  left_motors.move_velocity(-150);
+  right_motors.move_velocity(-150);
+  pros::delay(1000);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  MatchLoader.set_value(false);
+  */
 }
 
 void RedRight() {
@@ -43,17 +55,34 @@ void BlueLeft() {
 }
 
 void BlueRight() {
-  // chassis.setPose(48, -48, 270); // Example starting pose
   // Add Blue Right routine here
-  pros::lcd::print(0, "Running Blue Right");
-  chassis.setPose(0, 0, 0);
-  chassis.moveToPose(10.0f, 10.0f, 10.0f, 10);
+  bool intakeCurrentReached = false;
+  while (intakeCurrentReached && (intake.get_current_draw() < 2200 || intake.get_current_draw() > 2300)) {
+    left_motors.move_velocity(180);
+    right_motors.move_velocity(180);
+    if (intake.get_current_draw() > 2200 && intake.get_current_draw() < 2350) {
+      intakeCurrentReached = true;
+    } else {
+      intakeCurrentReached = false;
+    }
+    pros::delay(20);
+  }
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(200);
+  left_motors.move_velocity(-150);
+  right_motors.move_velocity(-150);
+  pros::delay(1000);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  MatchLoader.set_value(false);
 }
 
 void Skills() {
   if (homeScreen != NULL) {
     lv_scr_load(homeScreen);
   }
+  
   chassis.setPose(0, 0, imu.get_heading());
   Descorer.set_value(true); // moves odom up to avoid interference w/ parking
   intake.move_velocity(600);
@@ -126,7 +155,7 @@ if (fabs(err) <= 2.2) {
   pros::delay(1400);
   intake.move_velocity(0);
   MidGoal.set_value(false); 
-  chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 80}, false);
+  chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 90}, false);
   MatchLoader.set_value(true);
   chassis.turnToHeading(0, 1500);
   pros::delay(400);
@@ -146,6 +175,9 @@ if (fabs(err) <= 2.2) {
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
   pros::delay(200);
+  chassis.moveToPoint(51, -31, 4000, {.forwards = true});
+  MatchLoader.set_value(false);
+
   //chassis.moveToPoint(18, -31, 4000);
   /*
   pros::delay(650);
@@ -161,7 +193,6 @@ if (fabs(err) <= 2.2) {
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
   pros::delay(500);
-  i call my girlfriend mommy - Christian Tan
   Descorer.set_value(false);
 
   chassis.setPose(0, 0, 0);
@@ -174,7 +205,28 @@ if (fabs(err) <= 2.2) {
   // chassis.stop();
  */
   // Now do your “if voltage > 10,000 mV, drive backwards” behavior safely:
-  
+
+  intake.move_velocity(600);
+  MatchLoader.set_value(true);
+  pros::delay(500);
+  bool intakeReached = false;
+  while (!intakeReached) {
+    left_motors.move_velocity(100);
+    right_motors.move_velocity(100);
+    if (left_motors.get_current_draw() > 1750 && right_motors.get_current_draw() > 1750) {
+      intakeReached = true;
+    }
+    pros::delay(20);
+  }
+  bool blockCleared = false;
+  while (!blockCleared && (optical_sensor.get_rgb().red > 50 || optical_sensor.get_rgb().blue > 50)) {
+    right_motors.move_velocity(0);
+    left_motors.move_velocity(0);
+    if (optical_sensor.get_rgb().red < 50 && optical_sensor.get_rgb().blue < 50) {
+      blockCleared = true;
+    }
+    pros::delay(80);
+  }
 }
 
 
