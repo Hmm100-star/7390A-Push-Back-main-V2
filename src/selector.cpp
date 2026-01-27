@@ -18,6 +18,7 @@ lv_obj_t *confirmLabel;
 static lv_obj_t *intake_current_label = nullptr;
 static lv_obj_t *chassis_current_label = nullptr;
 static lv_obj_t *distance_label = nullptr;
+static lv_obj_t *heading_error_label = nullptr;
 
 // Forward declarations
 void createAllianceScreen();
@@ -219,7 +220,8 @@ bool isBlueAlliance() { return selectedAlliance == 1; }
 
 void initHomeDisplay() {
   if (homeScreen == NULL || intake_current_label != nullptr ||
-      chassis_current_label != nullptr || distance_label != nullptr) {
+      chassis_current_label != nullptr || distance_label != nullptr ||
+      heading_error_label != nullptr) {
     return;
   }
 
@@ -234,11 +236,15 @@ void initHomeDisplay() {
   distance_label = lv_label_create(homeScreen);
   lv_obj_set_pos(distance_label, 10, 50);
   lv_label_set_text(distance_label, "Distance: -- mm");
+
+  heading_error_label = lv_label_create(homeScreen);
+  lv_obj_set_pos(heading_error_label, 10, 70);
+  lv_label_set_text(heading_error_label, "Heading Err: --°");
 }
 
 void updateHomeDisplay() {
   if (intake_current_label == nullptr || chassis_current_label == nullptr ||
-      distance_label == nullptr) {
+      distance_label == nullptr || heading_error_label == nullptr) {
     return;
   }
 
@@ -271,4 +277,10 @@ void updateHomeDisplay() {
     snprintf(buffer, sizeof(buffer), "Distance: %d mm", distance_mm);
   }
   lv_label_set_text(distance_label, buffer);
+
+  double heading = imu.get_heading();
+  double err = std::fmod(heading + 180.0, 360.0) - 180.0;
+  double abs_err = std::fabs(err);
+  snprintf(buffer, sizeof(buffer), "Heading Err: %.2f°", abs_err);
+  lv_label_set_text(heading_error_label, buffer);
 }

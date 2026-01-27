@@ -6,6 +6,7 @@
 #include "liblvgl/lvgl.h"
 #include "pros/apix.h"
 #include "pros/optical.h"
+#include "pros/rtos.h"
 #include "selector.hpp"
 #include <algorithm>
 #include <cmath>
@@ -88,7 +89,7 @@ void Skills() {
   intake.move_velocity(600);
   // robot moves forward to intake blocks
   left_motors.move_velocity(20);
-  right_motors.move_velocity(50);
+  right_motors.move_velocity(57);
   pros::delay(700);
   left_motors.move_velocity(75);
   right_motors.move_velocity(10);
@@ -108,11 +109,9 @@ void Skills() {
   while (left_motors.get_current_draw() < 1750 && right_motors.get_current_draw() < 1750) {
     if (left_motors.get_current_draw() > 1700) {
       left_hit_velocity = 20;
-      right_hit_velocity = 120;
     }
     if (right_motors.get_current_draw() > 1700) {
       right_hit_velocity = 20;
-      left_hit_velocity = 120;
     }
     left_motors.move_velocity(left_hit_velocity);
     right_motors.move_velocity(right_hit_velocity);
@@ -128,7 +127,7 @@ void Skills() {
   double h = imu.get_heading();                 // 0..360
   double err = fmod(h + 180.0, 360.0) - 180.0;  // -> [-180, 180)
 
-if (fabs(err) <= 2.2) {
+if (fabs(err) <= 2) {
   chassis.setPose(
     (distance_sensor.get_distance() - 1700) / 25.4,
     0,
@@ -136,47 +135,48 @@ if (fabs(err) <= 2.2) {
   );
 } else {
   pros::delay(5000);
-}
-
-  chassis.moveToPoint(0, -14, 3000, {.forwards = false});
-  intake.move_velocity(0);
-  chassis.turnToHeading(-45, 2000);
-  chassis.moveToPoint(22.5, -32.5, 3000, {.forwards = false});
-  chassis.turnToHeading(45, 1500);
-  chassis.moveToPose(11.9, -39.8, 45, 2000, {.forwards = false}, false);
-  MidGoal.set_value(true);
-  intake.move_velocity(520);
-  pros::delay(750);
-  left_motors.move_velocity(5);
-  right_motors.move_velocity(5);
-  pros::delay(100);
-  left_motors.move_velocity(0);
-  right_motors.move_velocity(0);
-  pros::delay(1400);
-  intake.move_velocity(0);
-  MidGoal.set_value(false); 
-  chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 90}, false);
-  MatchLoader.set_value(true);
-  chassis.turnToHeading(0, 1500);
-  pros::delay(400);
-  chassis.cancelAllMotions();
-  intake.move_velocity(600);
-  bool intakeCurrentReached = false;
-  while (intakeCurrentReached && (intake.get_current_draw() < 2200 || intake.get_current_draw() > 2300)) {
-    left_motors.move_velocity(180);
-    right_motors.move_velocity(180);
-    if (intake.get_current_draw() > 2200 && intake.get_current_draw() < 2350) {
-      intakeCurrentReached = true;
-    } else {
-      intakeCurrentReached = false;
-    }
-    pros::delay(20);
+}/*else {
+  if (imu.get_heading() < 180) {
+  // Facing "right" side
+  chassis.setPose(
+    cos(imu.get_heading()) * ((distance_sensor.get_distance() - 1700) / 25.4),
+    0.2,
+    imu.get_heading());
+} else {
+  // Facing "left" side
+  chassis.setPose(cos(imu.get_heading()) * ((distance_sensor.get_distance() - 1700) / 25.4),
+  180, 
+  0.8);
   }
-  left_motors.move_velocity(0);
-  right_motors.move_velocity(0);
-  pros::delay(200);
-  chassis.moveToPoint(51, -31, 4000, {.forwards = true});
-  MatchLoader.set_value(false);
+}*/
+pros::delay(2000);
+chassis.moveToPoint(0, -14, 3000, {.forwards = false});
+intake.move_velocity(0);
+chassis.turnToHeading(-45, 2000);
+chassis.moveToPoint(22.5, -32.5, 3000, {.forwards = false});
+chassis.turnToHeading(45, 1500);
+chassis.moveToPose(3.2, -39.6, 45, 2000, {.forwards = false}, false);
+MidGoal.set_value(true);
+intake.move_velocity(520);
+pros::delay(750);
+left_motors.move_velocity(5);
+right_motors.move_velocity(5);
+pros::delay(100);
+left_motors.move_velocity(0);
+right_motors.move_velocity(0);
+pros::delay(1400);
+intake.move_velocity(0);
+MidGoal.set_value(false); 
+chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 90}, false);
+MatchLoader.set_value(true);
+chassis.turnToHeading(0, 1500);
+pros::delay(400);
+chassis.cancelAllMotions();
+
+left_motors.move_velocity(0);
+right_motors.move_velocity(0);
+pros::delay(200);
+MatchLoader.set_value(false);
 
   //chassis.moveToPoint(18, -31, 4000);
   /*
@@ -206,17 +206,17 @@ if (fabs(err) <= 2.2) {
  */
   // Now do your “if voltage > 10,000 mV, drive backwards” behavior safely:
 
-  intake.move_velocity(600);
-  MatchLoader.set_value(true);
-  pros::delay(500);
-  bool intakeReached = false;
-  while (!intakeReached) {
-    left_motors.move_velocity(100);
-    right_motors.move_velocity(100);
-    if (left_motors.get_current_draw() > 1750 && right_motors.get_current_draw() > 1750) {
-      intakeReached = true;
-    }
-    pros::delay(20);
+intake.move_velocity(600);
+MatchLoader.set_value(true);
+pros::delay(500);
+bool intakeReached = false;
+while (!intakeReached) {
+  left_motors.move_velocity(100);
+  right_motors.move_velocity(100);
+  if (left_motors.get_current_draw() > 1750 && right_motors.get_current_draw() > 1750) {
+    intakeReached = true;
+  }
+  pros::delay(20);
   }
   bool blockCleared = false;
   while (!blockCleared && (optical_sensor.get_rgb().red > 50 || optical_sensor.get_rgb().blue > 50)) {
@@ -227,6 +227,7 @@ if (fabs(err) <= 2.2) {
     }
     pros::delay(80);
   }
+  
 }
 
 
