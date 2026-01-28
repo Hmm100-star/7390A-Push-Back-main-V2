@@ -1,6 +1,7 @@
 #include "globals.hpp"
 #include "autons.hpp"
 #include "lemlib/api.hpp"
+#include "lemlib/chassis/chassis.hpp"
 #include "pros/misc.h"
 #include "pros/llemu.hpp"
 #include "liblvgl/lvgl.h"
@@ -259,6 +260,7 @@ void TuneChassis() {
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
   pros::delay(500);
+  // bot reverses to touch parking zone for accurate Position tracking
   int left_hit_velocity = 120;
   int right_hit_velocity = 120;
   while (left_motors.get_current_draw() < 1850 && right_motors.get_current_draw() < 1850) {
@@ -272,65 +274,26 @@ void TuneChassis() {
     right_motors.move_velocity(-right_hit_velocity);
     pros::delay(20);
   }
+
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
+  intake.move_velocity(0);
   pros::delay(400);
   Descorer.set_value(false); // lowers odom back down for position tracking
+  // Sets bot pose aftrer exiting parking zone
   chassis.setPose(
     (distance_sensor.get_distance() - 67) / 25.4,
     0,
     0
   );
-  pros::delay(5000);
-  double h = imu.get_heading();                 // 0..360
-  double err = fmod(h + 180.0, 360.0) - 180.0;  // -> [-180, 180)
+chassis.moveToPoint(10, 9.4, 1000);
+MatchLoader.set_value(false);
+chassis.turnToHeading(90, 1500);
+intake.move_velocity(600);
+chassis.moveToPoint(40, 7.9, 3000, {.maxSpeed = 90});
+chassis.turnToHeading(-45, 1500);
+chassis.moveToPoint(57, -10, 2000, {.forwards = false}, false);
+MidGoal.set_value(true); 
+intake.move_velocity(450);
 
-if (fabs(err) <= 2.2) {
-  chassis.setPose(
-    (distance_sensor.get_distance() - 1700) / 25.4,
-    0,
-    0
-  );
-} else {
-  pros::delay(6700); // delays for 6.7 seconds for maximum efficiency
-}
-
-  chassis.moveToPoint(0, -14, 3000, {.forwards = false});
-  intake.move_velocity(0);
-  chassis.turnToHeading(-45, 2000);
-  chassis.moveToPoint(22.5, -32.5, 3000, {.forwards = false});
-  chassis.turnToHeading(45, 1500);
-  chassis.moveToPose(11.9, -39.8, 45, 2000, {.forwards = false}, false);
-  MidGoal.set_value(true);
-  intake.move_velocity(520);
-  pros::delay(750);
-  left_motors.move_velocity(5);
-  right_motors.move_velocity(5);
-  pros::delay(100);
-  left_motors.move_velocity(0);
-  right_motors.move_velocity(0);
-  pros::delay(1400);
-  intake.move_velocity(0);
-  MidGoal.set_value(false);
-  chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 80}, false);
-  MatchLoader.set_value(true);
-  chassis.turnToHeading(0, 1500);
-  pros::delay(400);
-  chassis.cancelAllMotions();
-  intake.move_velocity(600);
-  bool intakeCurrentReached = false;
-  while (intakeCurrentReached && (intake.get_current_draw() < 2200 || intake.get_current_draw() > 2300)) {
-    left_motors.move_velocity(180);
-    right_motors.move_velocity(180);
-    if (intake.get_current_draw() > 2200 && intake.get_current_draw() < 2350) {
-      intakeCurrentReached = true;
-    } else {
-      intakeCurrentReached = false;
-    }
-    pros::delay(20);
-  }
-  left_motors.move_velocity(0);
-  right_motors.move_velocity(0);
-  pros::delay(200);
- //I like toes - Jesse Chu
 }
