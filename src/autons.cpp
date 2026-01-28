@@ -244,12 +244,93 @@ void TuneChassis() {
         lv_scr_load(homeScreen); 
     }
     
-  chassis.setPose(0,0,0);
-  chassis.moveToPoint(0,20,10000);
-  chassis.setPose(0,0,0);
+  if (homeScreen != NULL) {
+    lv_scr_load(homeScreen);
+  }
+  chassis.setPose(0, 0, imu.get_heading());
+  Descorer.set_value(true); // moves odom up to avoid interference w/ parking
+  intake.move_velocity(600);
+  left_motors.move_velocity(160);
+  right_motors.move_velocity(160);
+  pros::delay(1000);
+  MatchLoader.set_value(true);
+  pros::delay(1867);
+  //robot waits to allow current to 0
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(500);
+  int left_hit_velocity = 120;
+  int right_hit_velocity = 120;
+  while (left_motors.get_current_draw() < 1850 && right_motors.get_current_draw() < 1850) {
+    if (left_motors.get_current_draw() > 1800) {
+      left_hit_velocity = 20;
+    }
+    if (right_motors.get_current_draw() > 1800) {
+      right_hit_velocity = 20;
+    }
+    left_motors.move_velocity(-left_hit_velocity);
+    right_motors.move_velocity(-right_hit_velocity);
+    pros::delay(20);
+  }
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(400);
+  Descorer.set_value(false); // lowers odom back down for position tracking
+  chassis.setPose(
+    (distance_sensor.get_distance() - 67) / 25.4,
+    0,
+    0
+  );
   pros::delay(5000);
-chassis.turnToHeading(90,10000);
-pros::delay(5000);
-chassis.setPose(0,0,0);
-  chassis.moveToPose(-5, 38, -15, 10000, {.forwards = true});
+  double h = imu.get_heading();                 // 0..360
+  double err = fmod(h + 180.0, 360.0) - 180.0;  // -> [-180, 180)
+
+if (fabs(err) <= 2.2) {
+  chassis.setPose(
+    (distance_sensor.get_distance() - 1700) / 25.4,
+    0,
+    0
+  );
+} else {
+  pros::delay(6700); // delays for 6.7 seconds for maximum efficiency
+}
+
+  chassis.moveToPoint(0, -14, 3000, {.forwards = false});
+  intake.move_velocity(0);
+  chassis.turnToHeading(-45, 2000);
+  chassis.moveToPoint(22.5, -32.5, 3000, {.forwards = false});
+  chassis.turnToHeading(45, 1500);
+  chassis.moveToPose(11.9, -39.8, 45, 2000, {.forwards = false}, false);
+  MidGoal.set_value(true);
+  intake.move_velocity(520);
+  pros::delay(750);
+  left_motors.move_velocity(5);
+  right_motors.move_velocity(5);
+  pros::delay(100);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(1400);
+  intake.move_velocity(0);
+  MidGoal.set_value(false);
+  chassis.moveToPoint(51, 1.4, 2000, {.maxSpeed = 80}, false);
+  MatchLoader.set_value(true);
+  chassis.turnToHeading(0, 1500);
+  pros::delay(400);
+  chassis.cancelAllMotions();
+  intake.move_velocity(600);
+  bool intakeCurrentReached = false;
+  while (intakeCurrentReached && (intake.get_current_draw() < 2200 || intake.get_current_draw() > 2300)) {
+    left_motors.move_velocity(180);
+    right_motors.move_velocity(180);
+    if (intake.get_current_draw() > 2200 && intake.get_current_draw() < 2350) {
+      intakeCurrentReached = true;
+    } else {
+      intakeCurrentReached = false;
+    }
+    pros::delay(20);
+  }
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(200);
+ //I like toes - Jesse Chu
 }
