@@ -6,6 +6,7 @@
 #include "pros/llemu.hpp"
 #include "liblvgl/lvgl.h"
 #include "pros/apix.h"
+#include "pros/motors.h"
 #include "pros/optical.h"
 #include "pros/rtos.h"
 #include "selector.hpp"
@@ -239,6 +240,8 @@ void DoNothing() {
   chassis.moveToPose(0, 5, 0,1000);
 }
 
+
+// Starts without initial configuration
 void TuneChassis() {
   // Set the pose to 0, 0, 0
   if (homeScreen != NULL) {
@@ -248,14 +251,13 @@ void TuneChassis() {
   if (homeScreen != NULL) {
     lv_scr_load(homeScreen);
   }
+  intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   chassis.setPose(0, 0, imu.get_heading());
   Descorer.set_value(true); // moves odom up to avoid interference w/ parking
   intake.move_velocity(600);
   left_motors.move_velocity(160);
   right_motors.move_velocity(160);
-  pros::delay(1000);
-  MatchLoader.set_value(true);
-  pros::delay(1867);
+  pros::delay(2867);
   //robot waits to allow current to 0
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
@@ -286,14 +288,57 @@ void TuneChassis() {
     0,
     0
   );
-chassis.moveToPoint(10, 9.4, 1000);
+// 
+chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+chassis.swingToPoint(10 , 16, lemlib::DriveSide::RIGHT, 1000, {}, false);
 MatchLoader.set_value(false);
+chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 chassis.turnToHeading(90, 1500);
 intake.move_velocity(600);
-chassis.moveToPoint(40, 7.9, 3000, {.maxSpeed = 90});
-chassis.turnToHeading(-45, 1500);
-chassis.moveToPoint(57, -10, 2000, {.forwards = false}, false);
-MidGoal.set_value(true); 
-intake.move_velocity(450);
+chassis.moveToPoint(39, 10.8, 3000, {.maxSpeed = 70});
+chassis.turnToHeading(-45, 900);
+chassis.moveToPoint(57.3, -10, 2000, {.forwards = false, .maxSpeed = 75}, false);
 
+// Midgoal scoring
+MidGoal.set_value(true); 
+chassis.cancelAllMotions();
+intake.move_velocity(600);
+pros::delay(200);
+left_motors.move_velocity(25);
+right_motors.move_velocity(25);
+pros::delay(420);
+left_motors.move_velocity(0);
+right_motors.move_velocity(0);
+pros::delay(1200);
+intake.move_velocity(450);
+pros::delay(1200);
+intake.move_velocity(0);
+MidGoal.set_value(false);
+
+// Prep to matchload
+chassis.moveToPoint(23.8, 31, 1500, {.maxSpeed = 90});
+MatchLoader.set_value(true);
+chassis.turnToHeading(-90, 1500);
+chassis.moveToPoint(13.4, 31, 1000, {.maxSpeed = 100}, false);
+intake.move_velocity(600);
+// Reaches matchloader
+bool intakeReached = false;
+left_motors.move_velocity(150);
+right_motors.move_velocity(150);
+pros::delay(500);
+// Clears matchloader
+left_motors.move_velocity(5);
+right_motors.move_velocity(5);
+pros::delay(3000);
+chassis.moveToPose(32, 43.7, -112, 1500, {.forwards = false});
+chassis.turnToHeading(-90, 1000);
+chassis.moveToPoint(101.1, 40.4, 5000, {.forwards = false, .maxSpeed = 100});
+MatchLoader.set_value(false);
+intake.move_velocity(0);
+chassis.turnToHeading(0, 1000);
+chassis.moveToPoint(113, 25.5, 500, {.forwards = false});
+chassis.turnToHeading(90, 1500);
+chassis.moveToPoint(96.9, 29.7, 500, {.forwards = false});
+LongGoal.set_value(true);
+intake.move_velocity(600);
 }
