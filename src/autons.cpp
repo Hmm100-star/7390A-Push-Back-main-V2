@@ -243,7 +243,7 @@ void DoNothing() {
 
 // Starts without initial configuration
 void TuneChassis() {
-  // Set the pose to 0, 0, 0
+  // Homescreen setup
   if (homeScreen != NULL) {
         lv_scr_load(homeScreen); 
     }
@@ -251,6 +251,8 @@ void TuneChassis() {
   if (homeScreen != NULL) {
     lv_scr_load(homeScreen);
   }
+
+  // Parking Zone routine
   intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   chassis.setPose(0, 0, imu.get_heading());
   Descorer.set_value(true); // moves odom up to avoid interference w/ parking
@@ -288,7 +290,7 @@ void TuneChassis() {
     0,
     0
   );
-// 
+// Align to midgoal
 chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 chassis.swingToPoint(10 , 16, lemlib::DriveSide::RIGHT, 1000, {}, false);
 MatchLoader.set_value(false);
@@ -300,24 +302,22 @@ chassis.turnToHeading(-45, 900);
 chassis.moveToPoint(57.3, -10, 2000, {.forwards = false, .maxSpeed = 75}, false);
 
 // Midgoal scoring
-MidGoal.set_value(true); 
-chassis.cancelAllMotions();
+MidGoal.set_value(true);
 intake.move_velocity(600);
 pros::delay(200);
-left_motors.move_velocity(25);
-right_motors.move_velocity(25);
-pros::delay(420);
+chassis.moveToPoint(56.8, -9.5, 2000, {.forwards = true, .maxSpeed = 25}, true);
+pros::delay(320);
 left_motors.move_velocity(0);
 right_motors.move_velocity(0);
 pros::delay(1200);
 intake.move_velocity(450);
 pros::delay(1200);
 intake.move_velocity(0);
-MidGoal.set_value(false);
 
 // Prep to matchload
 chassis.moveToPoint(23.8, 31, 1500, {.maxSpeed = 90});
 MatchLoader.set_value(true);
+MidGoal.set_value(false);
 chassis.turnToHeading(-90, 1500);
 chassis.moveToPoint(13.4, 31, 1000, {.maxSpeed = 100}, false);
 intake.move_velocity(600);
@@ -330,15 +330,15 @@ pros::delay(500);
 left_motors.move_velocity(5);
 right_motors.move_velocity(5);
 pros::delay(3000);
-chassis.moveToPose(32, 43.7, -112, 1500, {.forwards = false});
+chassis.moveToPose(37, 45.5, -112, 1500, {.forwards = false});
 chassis.turnToHeading(-90, 1000);
-chassis.moveToPoint(101.1, 40.4, 5000, {.forwards = false, .maxSpeed = 100});
+chassis.moveToPoint(101.1, 45.5, 5000, {.forwards = false, .maxSpeed = 100});
 MatchLoader.set_value(false);
 intake.move_velocity(0);
-chassis.turnToHeading(0, 1000);
-chassis.moveToPoint(113, 25.5, 500, {.forwards = false});
-chassis.turnToHeading(90, 1500);
-chassis.moveToPoint(96.9, 29.7, 500, {.forwards = false});
+chassis.moveToPoint(116.4, 28.3, 2000, {.forwards = false, .maxSpeed = 80});
+chassis.turnToHeading(90, 1200);
+chassis.moveToPoint(94.7, 29.7, 1500, {.forwards = false});
 LongGoal.set_value(true);
 intake.move_velocity(600);
 }
+
