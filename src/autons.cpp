@@ -29,7 +29,7 @@ void RedLeft() {
   intake.move_velocity(0);
   chassis.moveToPoint(-30.8,5.6, 1500, {.maxSpeed = 80});
   chassis.turnToHeading(-170, 900);
-  chassis.moveToPoint(-33.6, -2.9, 1300, {}, false);
+  chassis.moveToPoint(-33.6, -2.9, 1300, {.maxSpeed = 60}, false);
   intake.move_velocity(600);
   chassis.cancelAllMotions();
   left_motors.move_velocity(40);
@@ -67,7 +67,7 @@ void RedRight() {
   intake.move_velocity(0);
   chassis.moveToPoint(30, 8.5, 1800, {.maxSpeed = 80});
   chassis.turnToHeading(170, 700);
-  chassis.moveToPoint(33.9, -2.7, 1600, {}, false);
+  chassis.moveToPoint(33.9, -2.7, 1600, {.maxSpeed = 60}, false);
   intake.move_velocity(600);
   chassis.cancelAllMotions();
   left_motors.move_velocity(40);
@@ -98,17 +98,20 @@ void BlueLeft() {
     lv_scr_load(homeScreen);
   }
   chassis.setPose(0, 0, 0);
+  //grabs 3 balls in front
   intake.move_velocity(600);
   chassis.moveToPoint(0,24, 1200, {.maxSpeed = 99});
   pros::delay(400);
   MatchLoader.set_value(true);
+  // preps to matchload
   chassis.turnToHeading(-120, 770, {}, false);
   intake.move_velocity(0);
   chassis.moveToPoint(-30.8,5.6, 1500, {.maxSpeed = 80});
   chassis.turnToHeading(-170, 900);
-  chassis.moveToPoint(-33.6, -2.9, 1300, {}, false);
+  chassis.moveToPoint(-33.6, -2.9, 1300, {.maxSpeed = 60}, false);
   intake.move_velocity(600);
   chassis.cancelAllMotions();
+  // matchloads the blocks
   left_motors.move_velocity(40);
   right_motors.move_velocity(40); 
   pros::delay(500);
@@ -118,6 +121,7 @@ void BlueLeft() {
   intake.move_velocity(0);
   left_motors.move_velocity(0);
   right_motors.move_velocity(0);
+  // scores long goal
   chassis.moveToPoint(-28.3, 26.8, 1500, {.forwards = false});
   LongGoal.set_value(true);
   pros::delay(267);
@@ -125,6 +129,7 @@ void BlueLeft() {
   pros::delay(3300);
   LongGoal.set_value(false);
   intake.move_velocity(0);
+  // backs up and rams forward to ensure control zone
   chassis.moveToPoint(-31.6, 8.5, 1000, {.maxSpeed = 80});
   chassis.moveToPoint(-27.6, 31.2, 1800, {.forwards = false});
   
@@ -144,7 +149,7 @@ void BlueRight() {
   intake.move_velocity(0);
   chassis.moveToPoint(30, 8.5, 1800, {.maxSpeed = 80});
   chassis.turnToHeading(170, 700);
-  chassis.moveToPoint(33.9, -2.7, 1600, {}, false);
+  chassis.moveToPoint(33.9, -2.7, 1600, {.maxSpeed = 60}, false);
   intake.move_velocity(600);
   chassis.cancelAllMotions();
   left_motors.move_velocity(40);
