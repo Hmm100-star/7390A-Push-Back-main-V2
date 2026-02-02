@@ -410,6 +410,9 @@ void TuneChassis() {
   right_motors.move_velocity(0);
   chassis.moveToPoint(-10, 87.9, 1500, {.forwards = false, .maxSpeed = 70});
 
+
+
+  
     LongGoal.set_value(true);
   pros::delay(300);
   intake.move_velocity(600);
