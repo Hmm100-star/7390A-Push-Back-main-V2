@@ -344,16 +344,22 @@ void DoNothing() {
 // Starts without initial configuration
 void TuneChassis() {
  
+  // Sets homescreen to default config to show coordinates
     if (homeScreen != NULL) {
     lv_scr_load(homeScreen);
   }
-  chassis.setPose(0, 0, imu.get_heading());
+
+  // Grabs 4 balls in front
+  chassis.setPose(0, 0, imu.get_heading()); 
   intake.move_velocity(600);
-  chassis.moveToPoint(-5.7, 22.9, 1100, {.maxSpeed = 70});
+  chassis.moveToPoint(-5.7, 22.9, 1050, {.maxSpeed = 70});
   pros::delay(467);
   MatchLoader.set_value(true);
+
+
+  // Scores 4 blocks
   chassis.turnToHeading(-120,800);
-  chassis.moveToPoint(-29.7, 10.9, 1000, {.maxSpeed = 75});
+  chassis.moveToPoint(-29.8, 10.9, 1000, {.maxSpeed = 75});
   intake.move_velocity(0);
   chassis.turnToHeading(180, 800);
   chassis.moveToPoint(-31.6, 24, 1000, {.forwards = false, .maxSpeed = 70});
@@ -362,22 +368,57 @@ void TuneChassis() {
   intake.move_velocity(600);
   pros::delay(2000);
   LongGoal.set_value(false);
-  chassis.moveToPoint(-31.6, -11.4, 3000, {.maxSpeed = 55});
+
+  // Matchloads 1st tube
+  chassis.moveToPoint(-31.6, -11.4, 3000, {.maxSpeed = 52});
   intake.move_velocity(600);
   pros::delay(3200);
+
+  // Preps to score on other side
   chassis.moveToPoint(-43.5, 25.5, 1200, {.forwards = false, .maxSpeed = 70});
   chassis.turnToHeading(180, 800, {.maxSpeed = 70});
-  chassis.moveToPoint(-44.8, 80.5, 3000, {.forwards = false, .maxSpeed = 92});
-  chassis.moveToPoint(-30.9, 107.5, 1500, {.forwards = false, .maxSpeed = 70});
+  chassis.moveToPoint(-44.4, 80.5, 3000, {.forwards = false, .maxSpeed = 92});
+  chassis.moveToPoint(-30, 107.5, 1500, {.forwards = false, .maxSpeed = 70});
   chassis.turnToHeading(0, 900, {.maxSpeed = 70});
 
-
+  // Scores 6 blocks
   chassis.moveToPoint(-31.2, 82.9, 1000, {.forwards = false, .maxSpeed = 70});
   LongGoal.set_value(true);
   pros::delay(300);
   intake.move_velocity(600);
   pros::delay(3000);
   LongGoal.set_value(false);
-  
+
+  // Matchloads 2nd tube
+  chassis.moveToPOint(-31.2, 118.3, 3000, {.maxSpeed = 52});
+  intake.move_velocity(600);
+  pros::delay(3200);
+
+  // Scores 6 blocks again 
+  chassis.moveToPoint(-31.2, 82.9, 1000, {.forwards = false, .maxSpeed = 70});
+  LongGoal.set_value(true);
+  pros::delay(300);
+  intake.move_velocity(600);
+  pros::delay(3000);
+  LongGoal.set_value(false);
+
+  // Moves back and forward again to ensure control zone
+  chassis.cancelAllMotions();
+  left_motors.move_velocity(120);
+  right_motors.move_velocity(120);
+  pros::delay(700);
+  left_motors.move_velocity(0);
+  right_motors.move_velocity(0);
+  pros::delay(200);
+  left_motors.move_velocity(-120);
+  right_motors.move_velocity(-120);
+  pros::delay(850);
+
+ // Preps to matchload 3rd tube
+chassis.moveToPoint(-31.2, 100, 1000, {.maxSpeed = 70});
+chassis.turnToHeading(90, 800, {.maxSpeed = 70});
+chassis.moveToPoint(-64, 102, 3500, {.maxSpeed 85});
+chassis.turnToHeading(180, 800);
+
 }
 
