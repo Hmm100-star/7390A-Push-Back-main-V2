@@ -350,19 +350,19 @@ void TuneChassis() {
   }
 
   // Grabs 4 balls in front
-  chassis.setPose(0, 0, imu.get_heading()-15.75); 
+  chassis.setPose(0, 0, imu.get_heading()); 
   intake.move_velocity(600);
-  chassis.moveToPoint(-5.7, 22.9, 1050, {.maxSpeed = 70});
+  chassis.moveToPoint(-5.7, 22.9, 1050, {.maxSpeed = 65});
   pros::delay(467);
   MatchLoader.set_value(true);
 
 
   // Scores 4 blocks
   chassis.turnToHeading(-120,900, {.maxSpeed = 75});
-  chassis.moveToPoint(-29, 10.9, 1000, {.maxSpeed = 72});
+  chassis.moveToPoint(-28.7, 10.9, 1000, {.maxSpeed = 72});
   intake.move_velocity(0);
   chassis.turnToHeading(180, 800);
-  chassis.moveToPoint(-31.4, 24, 1000, {.forwards = false, .maxSpeed = 70});
+  chassis.moveToPoint(-31.2, 24, 1000, {.forwards = false, .maxSpeed = 70});
   LongGoal.set_value(true);
   pros::delay(300);
   intake.move_velocity(600);
@@ -370,20 +370,20 @@ void TuneChassis() {
   LongGoal.set_value(false);
 
   // Matchloads 1st tube
-  chassis.moveToPoint(-31.4, -12, 3000, {.maxSpeed = 50});
+  chassis.moveToPoint(-31.2, -12, 3000, {.maxSpeed = 50});
   intake.move_velocity(600);
   pros::delay(3200);
 
   // Preps to score on other side
   chassis.moveToPoint(-43.5, 25.5, 1200, {.forwards = false, .maxSpeed = 70});
   chassis.turnToHeading(180, 800, {.maxSpeed = 70});
-  chassis.moveToPoint(-44.4, 80.5, 3000, {.forwards = false, .maxSpeed = 80});
+  chassis.moveToPoint(-43.8, 80.5, 3000, {.forwards = false, .maxSpeed = 80});
   intake.move_velocity(0);
-  chassis.moveToPoint(-28.9, 107.5, 1600, {.forwards = false, .maxSpeed = 70});
+  chassis.moveToPoint(-28.5, 107.5, 1600, {.forwards = false, .maxSpeed = 70});
   chassis.turnToHeading(0, 900, {.maxSpeed = 70});
 
   // Scores 6 blocks
-  chassis.moveToPoint(-30.1, 82.5, 1000, {.forwards = false, .maxSpeed = 70});
+  chassis.moveToPoint(-30.3, 82.5, 1000, {.forwards = false, .maxSpeed = 70});
   LongGoal.set_value(true);
   pros::delay(700);
   intake.move_velocity(600);
@@ -391,7 +391,7 @@ void TuneChassis() {
   LongGoal.set_value(false);
 
   // Matchloads 2nd tube
-  chassis.moveToPoint(-29.8, 118.5, 3000, {.maxSpeed = 50});
+  chassis.moveToPoint(-30.3, 118.5, 3000, {.maxSpeed = 50});
   intake.move_velocity(600);
   pros::delay(3200);
   intake.move_velocity(0);
@@ -434,10 +434,10 @@ chassis.moveToPoint(81.5, 85.2, 1200, {.forwards = false, .maxSpeed = 70});
 chassis.turnToHeading(0, 900, {.maxSpeed = 75});
 intake.move_velocity(0);
 chassis.moveToPoint(82.2, 30.2, 3000, {.forwards = false, .maxSpeed = 80});
-chassis.moveToPoint(68.7, 3.2, 1600, {.forwards = false, .maxSpeed = 70});
+chassis.moveToPoint(67.5, 3.2, 1600, {.forwards = false, .maxSpeed = 70});
 chassis.turnToHeading(180, 900, {.maxSpeed = 70});
 //score 6 blocks 
-chassis.moveToPoint(69.6, 33.7, 1000, {.forwards = false, .maxSpeed = 70});
+chassis.moveToPoint(67.9, 33.7, 1000, {.forwards = false, .maxSpeed = 70});
 LongGoal.set_value(true);
 pros::delay(700);
 intake.move_velocity(600);
@@ -445,13 +445,13 @@ pros::delay(3300);
 LongGoal.set_value(false);
 
 //matchloads 4th tube
-chassis.moveToPoint(69, -12, 3000, {.maxSpeed = 50});
+chassis.moveToPoint(67.4, -12, 3000, {.maxSpeed = 50});
 intake.move_velocity(600);
 pros::delay(3200);
 intake.move_velocity(0);
 
 // scores last 6 blocks
-chassis.moveToPoint(69.5, 35, 1000, {.forwards = false, .maxSpeed = 60});
+chassis.moveToPoint(68.2, 35, 1000, {.forwards = false, .maxSpeed = 60});
 LongGoal.set_value(true);
 pros::delay(700);
 intake.move_velocity(600);
@@ -460,7 +460,7 @@ LongGoal.set_value(false);
 intake.move_velocity(0);
 
 // Moves back and forward again to ensure control zone
-  chassis.cancelAllMotions();
+  /*chassis.cancelAllMotions();
   pros::delay(300);
   left_motors.move_velocity(100);
   right_motors.move_velocity(100);
@@ -476,22 +476,35 @@ intake.move_velocity(0);
   LongGoal.set_value(false);
   intake.move_velocity(0);
 
-  
-chassis.moveToPoint(69.7, 23.2, 1000, {.forwards = false, .maxSpeed = 70});
+  */
+chassis.moveToPoint(67.9, 23.2, 1000, {.forwards = false, .maxSpeed = 70});
 MatchLoader.set_value(false);
 //chassis.moveToPoint(45.1, -7.4, 1000, {.maxSpeed = 75});
 //chassis.turnToHeading(-90, 800, {.maxSpeed = 70});
-chassis.moveToPose(45, -4, -75, 3000, {.maxSpeed = 85});
-chassis.moveToPose(37, -12, -90, 1500, {.maxSpeed = 75}, false);
+//chassis.moveToPose(45, -4, -100, 3000, {.maxSpeed = 85});
+chassis.moveToPoint(69.7, 10, 900, {.forwards = true, .maxSpeed = 70});
+chassis.turnToHeading(-90, 800, {.maxSpeed = 70});
+chassis.moveToPoint(22.5, 13, 1200, {.forwards = true, .maxSpeed = 70});
+chassis.turnToHeading(180, 700, {.maxSpeed = 70}, false);
 chassis.cancelAllMotions();
 
-
+Descorer.set_value(true);
 pros::delay(200);
 intake.move_velocity(600);
-left_motors.move_velocity(320);
-right_motors.move_velocity(340);
-pros::delay(2500);
+left_motors.move_velocity(350);
+right_motors.move_velocity(350);
+pros::delay(2000);
 left_motors.move_velocity(0);
 right_motors.move_velocity(0);
 
+//344.6
+//344.5 95
+//344.4 82
+//344.3
+//344.2
+//344.1
+//344.0
+//343.9
+//343.8
+//343.7
 }
